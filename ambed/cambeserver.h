@@ -63,8 +63,8 @@ protected:
     CController     m_Controller;
     
     // threads
-    bool            m_bStopThreads;
-    std::thread    *m_pThread;
+    std::atomic<bool> m_bStopThreads;
+    std::thread *m_pThread;
     
 public:
 #ifdef DEBUG_DUMPFILE

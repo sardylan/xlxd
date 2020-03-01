@@ -121,5 +121,5 @@ void CAmbeServer::Thread(CAmbeServer *This)
 void CAmbeServer::Task(void)
 {
     // and wait a bit
-    CTimePoint::TaskSleepFor(10000);
+    CTimePoint::TaskSleepFor(1000);
 }

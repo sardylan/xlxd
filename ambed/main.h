@@ -143,6 +143,7 @@ extern CAmbeServer  g_AmbeServer;
 class CVocodecs;
 extern CVocodecs    g_Vocodecs;
 
- 
+void signalHandler(int);
+
 ////////////////////////////////////////////////////////////////////////////////////////
 #endif /* main_h */

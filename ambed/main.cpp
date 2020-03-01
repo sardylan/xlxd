@@ -22,6 +22,8 @@
 //    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+#include <csignal>
+
 #include "main.h"
 #include "ctimepoint.h"
 #include "cambeserver.h"
@@ -32,6 +34,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 // global objects
 
+bool keepRunning = true;
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // function declaration
@@ -40,7 +43,7 @@
 int main(int argc, const char * argv[])
 {
 #ifdef RUN_AS_DAEMON
-    
+
     // redirect cout, cerr and clog to syslog
     syslog::redirect cout_redir(std::cout);
     syslog::redirect cerr_redir(std::cerr);
@@ -82,45 +85,43 @@ int main(int argc, const char * argv[])
     close(STDIN_FILENO);
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
-    
+
 #endif
-    
+
+    signal(SIGINT, signalHandler);
+
     // check arguments
     const char *listenIpAddress = argc == 2 ? argv[1] : "0.0.0.0";
 
     // initialize ambeserver
     g_AmbeServer.SetListenIp(CIp(listenIpAddress));
-    
+
     // and let it run
-    std::cout << "Starting AMBEd " << VERSION_MAJOR << "." << VERSION_MINOR << "." << VERSION_REVISION << std::endl << std::endl;
-    if ( !g_AmbeServer.Start() )
-    {
+    std::cout << "Starting AMBEd "
+              << VERSION_MAJOR << "." << VERSION_MINOR << "." << VERSION_REVISION << std::endl
+              << std::endl;
+
+    if (!g_AmbeServer.Start()) {
         std::cout << "Error starting AMBEd" << std::endl;
         exit(EXIT_FAILURE);
     }
+
     std::cout << "AMBEd started and listening on " << g_AmbeServer.GetListenIp() << std::endl;
-    
-#ifdef RUN_AS_DAEMON
-    // run forever
-    while ( true )
-    {
-        // sleep 60 seconds
-        CTimePoint::TaskSleepFor(60000);
-    }
-#else
-    // wait any key
-    for (;;)
-    {
-        // sleep 60 seconds
-        CTimePoint::TaskSleepFor(60000);
-        //std::cin.get();
-    }
-#endif
-    
-    // and wait for end
+
+    while (keepRunning)
+        CTimePoint::TaskSleepFor(1000);
+
     g_AmbeServer.Stop();
+
     std::cout << "AMBEd stopped" << std::endl;
-    
-    // done
+
     exit(EXIT_SUCCESS);
+}
+
+void signalHandler(int signum) {
+    if (signum == SIGINT) {
+        std::cout << "SIGINT received" << std::endl;
+        std::cout << "Stopping AMBE Server" << std::endl;
+        keepRunning = false;
+    }
 }
