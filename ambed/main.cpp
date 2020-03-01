@@ -86,15 +86,10 @@ int main(int argc, const char * argv[])
 #endif
     
     // check arguments
-    if ( argc != 2 )
-    {
-        std::cout << "Usage: ambed ip" << std::endl;
-        std::cout << "example: ambed 192.168.178.212" << std::endl;
-        return 1;
-    }
-    
+    const char *listenIpAddress = argc == 2 ? argv[1] : "0.0.0.0";
+
     // initialize ambeserver
-    g_AmbeServer.SetListenIp(CIp(argv[1]));
+    g_AmbeServer.SetListenIp(CIp(listenIpAddress));
     
     // and let it run
     std::cout << "Starting AMBEd " << VERSION_MAJOR << "." << VERSION_MINOR << "." << VERSION_REVISION << std::endl << std::endl;
