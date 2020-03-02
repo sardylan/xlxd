@@ -23,7 +23,7 @@
 // ----------------------------------------------------------------------------
 
 #include "main.h"
-#include <string.h>
+#include <cstring>
 #include "cusb3000interface.h"
 #include "cusb3003interface.h"
 #include "cusb3003hrinterface.h"
@@ -67,27 +67,14 @@ CFtdiDeviceDescr::CFtdiDeviceDescr(const CFtdiDeviceDescr &descr)
 int CFtdiDeviceDescr::CreateInterface(CFtdiDeviceDescr *descr, std::vector<CVocodecChannel *>*channels)
 {
     int iNbChs = 0;
-    
-    // single channel devices cannot be created alone
-    // three channels devices
-    if ( (::strcmp(descr->GetDescription(), "USB-3003")    == 0) ||     // DVSI's  USB-3003
-         (::strcmp(descr->GetDescription(), "DF2ET-3003")  == 0) ||     // DF2ET's USB-3003 opensource device
-         (::strcmp(descr->GetDescription(), "DVstick-33")  == 0) ||     // DVMEGA USB-3003 device  
-         (::strcmp(descr->GetDescription(), "ThumbDV-3")   == 0) )      // ThumbDV-3
-    {
+
+    if (isThreeChannel(descr))
         iNbChs = CreateUsb3003(descr, channels);
-    }
-    // six channels devices
-    else if ( (::strcmp(descr->GetDescription(), "USB-3006 A") == 0) )  // LX3JL's USB-3006 opensource device
-    {
+    else if (isSixChannel(descr))
         iNbChs = CreateUsb3006(descr, channels);
-    }
-    // twelves channels devices
-    else if ( (::strcmp(descr->GetDescription(), "USB-3012 A") == 0) )  // DVSI's USB-3012
-    {
+    else if (isTwelveChannel(descr))
         iNbChs = CreateUsb3012(descr, channels);
-    }
-    // done
+
     return iNbChs;
 }
 
@@ -162,34 +149,16 @@ const char * CFtdiDeviceDescr::GetChannelSerialNumber(int ch) const
 int CFtdiDeviceDescr::GetNbChannels(void) const
 {
     int iNbChs = 0;
-    
-    // single channel devices
-    if ( (::strcmp(m_szDescription, "USB-3000")   == 0) ||           // DVSI's USB-3000
-         (::strcmp(m_szDescription, "DVstick-30") == 0) ||           // DVMEGA AMBE3000 device
-         (::strcmp(m_szDescription, "ThumbDV")    == 0) )            // ThumbDV
-    {
+
+    if (isOneChannel(this))
         iNbChs = 1;
-    }
-    // three channels devices
-    else if ( (::strcmp(m_szDescription, "USB-3003")    == 0) ||     // DVSI's  USB-3003
-              (::strcmp(m_szDescription, "DF2ET-3003")  == 0) ||     // DF2ET's USB-3003 opensource device
-              (::strcmp(m_szDescription, "DVstick-33")  == 0) ||     // DVMEGA AMBE 3003 device
-              (::strcmp(m_szDescription, "ThumbDV-3")   == 0) )      // ThumbDV-3
-    {
+    else if (isThreeChannel(this))
         iNbChs = 3;
-    }
-    // six channels devices
-    else if ( (::strcmp(m_szDescription, "USB-3006 A") == 0) )       // LX3JL's USB-3006 opensource device
-    {
+    else if (isSixChannel(this))
         iNbChs = 6;
-    }
-    // twelves channels devices
-    else if ( (::strcmp(m_szDescription, "USB-3012 A") == 0) )       // DVSI's USB-3012
-    {
+    else if (isTwelveChannel(this))
         iNbChs = 12;
-    }
-  
-    // done
+
     return iNbChs;
 }
 
@@ -581,16 +550,129 @@ CUsb3003Interface *CFtdiDeviceDescr::InstantiateUsb3003(CFtdiDeviceDescr *descr)
 
 CUsb3000Interface *CFtdiDeviceDescr::InstantiateUsb3000(CFtdiDeviceDescr *descr)
 {
-    CUsb3000Interface *Usb3000 = NULL;
-    
-    // intstantiate the proper version of USB-3000
-    if ( (::strcmp(descr->GetDescription(), "USB-3000")  == 0) ||           // DVSI's USB-3000
-         (::strcmp(descr->GetDescription(), "DVstick-30")== 0) ||           // DVMEGA AMBE3000 device
-         (::strcmp(descr->GetDescription(), "ThumbDV")   == 0) )            // ThumbDV
-   {
-        Usb3000 = new CUsb3000Interface
-            (descr->GetVid(), descr->GetPid(), descr->GetDescription(), descr->GetSerialNumber());
-    }
-    // done
+    CUsb3000Interface *Usb3000 = nullptr;
+
+    uint32 vendorId = descr->GetVid();
+    uint32 productId = descr->GetPid();
+    const char *description = descr->GetDescription();
+    const char *serialNumber = descr->GetSerialNumber();
+
+    if (isOneChannel(descr))
+        Usb3000 = new CUsb3000Interface(vendorId, productId, description, serialNumber);
+
     return Usb3000;
+}
+
+bool CFtdiDeviceDescr::isOneChannel(const CFtdiDeviceDescr *deviceDescriptor) {
+    uint32 vendorId = deviceDescriptor->GetVid();
+    uint32 productId = deviceDescriptor->GetPid();
+    const char *description = deviceDescriptor->GetDescription();
+
+    const std::vector<std::vector<uint32_t >> deviceVidPidOneChannel = {
+            {0x0403, 0x6015}    // DVMEGA DVstick30
+    };
+
+    for (std::vector<uint32_t> item:deviceVidPidOneChannel) {
+        uint32 pid = item[0];
+        uint32 vid = item[1];
+
+        if (vendorId == vid && productId == pid)
+            return true;
+    }
+
+    const std::vector<std::string> deviceDescriptionsOneChannel = {
+            "USB-3000",         // DVSI's USB-3000
+            "DVstick-30",       // DVMEGA AMBE3000 device
+            "ThumbDV"           // ThumbDV
+    };
+
+    for (const std::string &desc: deviceDescriptionsOneChannel)
+        if (std::strcmp(desc.c_str(), description) == 0)
+            return true;
+
+    return false;
+}
+
+bool CFtdiDeviceDescr::isThreeChannel(const CFtdiDeviceDescr *deviceDescriptor) {
+    uint32 vendorId = deviceDescriptor->GetVid();
+    uint32 productId = deviceDescriptor->GetPid();
+    const char *description = deviceDescriptor->GetDescription();
+
+    const std::vector<std::vector<uint32_t >> devicePidVidOneChannel = {
+    };
+
+    for (std::vector<uint32_t> item:devicePidVidOneChannel) {
+        uint32 vid = item[0];
+        uint32 pid = item[1];
+
+        if (vendorId == vid && productId == pid)
+            return true;
+    }
+
+    const std::vector<std::string> deviceDescriptionsOneChannel = {
+            "USB-3003",         // DVSI's  USB-3003
+            "DF2ET-3003",       // DF2ET's USB-3003 opensource device
+            "DVstick-33",       // DVMEGA AMBE 3003 device
+            "ThumbDV-3"         // ThumbDV-3
+    };
+
+    for (const std::string &desc: deviceDescriptionsOneChannel)
+        if (std::strcmp(desc.c_str(), description) == 0)
+            return true;
+
+    return false;
+}
+
+bool CFtdiDeviceDescr::isSixChannel(const CFtdiDeviceDescr *deviceDescriptor) {
+    uint32 vendorId = deviceDescriptor->GetVid();
+    uint32 productId = deviceDescriptor->GetPid();
+    const char *description = deviceDescriptor->GetDescription();
+
+    const std::vector<std::vector<uint32_t >> devicePidVidOneChannel = {
+    };
+
+    for (std::vector<uint32_t> item:devicePidVidOneChannel) {
+        uint32 vid = item[0];
+        uint32 pid = item[1];
+
+        if (vendorId == vid && productId == pid)
+            return true;
+    }
+
+    const std::vector<std::string> deviceDescriptionsOneChannel = {
+            "USB-3006 A",       // LX3JL's USB-3006 opensource device
+    };
+
+    for (const std::string &desc: deviceDescriptionsOneChannel)
+        if (std::strcmp(desc.c_str(), description) == 0)
+            return true;
+
+    return false;
+}
+
+bool CFtdiDeviceDescr::isTwelveChannel(const CFtdiDeviceDescr *deviceDescriptor) {
+    uint32 vendorId = deviceDescriptor->GetVid();
+    uint32 productId = deviceDescriptor->GetPid();
+    const char *description = deviceDescriptor->GetDescription();
+
+    const std::vector<std::vector<uint32_t >> devicePidVidOneChannel = {
+    };
+
+    for (std::vector<uint32_t> item:devicePidVidOneChannel) {
+        uint32 vid = item[0];
+        uint32 pid = item[1];
+
+        if (vendorId == vid && productId == pid)
+            return true;
+    }
+
+    const std::vector<std::string> deviceDescriptionsOneChannel = {
+            "USB-3012 A",       // DVSI's USB-3012
+    };
+
+    for (const std::string &desc: deviceDescriptionsOneChannel)
+        if (std::strcmp(desc.c_str(), description) == 0)
+            return true;
+
+    return false;
 }

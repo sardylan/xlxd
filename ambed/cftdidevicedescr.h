@@ -81,8 +81,7 @@ protected:
     static int  CreatePair(CUsb3000Interface *, CUsb3000Interface *, std::vector<CVocodecChannel *>*);
     static CUsb3003Interface *InstantiateUsb3003(CFtdiDeviceDescr *);
     static CUsb3000Interface *InstantiateUsb3000(CFtdiDeviceDescr *);
-  
-protected:
+
     // status
     bool    m_bUsed;
     
@@ -91,6 +90,16 @@ protected:
     uint32  m_uiPid;
     char    m_szDescription[FTDI_MAX_STRINGLENGTH];
     char    m_szSerial[FTDI_MAX_STRINGLENGTH];
+
+private:
+
+    static bool isOneChannel(const CFtdiDeviceDescr *);
+
+    static bool isThreeChannel(const CFtdiDeviceDescr *);
+
+    static bool isSixChannel(const CFtdiDeviceDescr *);
+
+    static bool isTwelveChannel(const CFtdiDeviceDescr *);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////
