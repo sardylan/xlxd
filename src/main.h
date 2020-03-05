@@ -218,6 +218,9 @@ extern CGateKeeper g_GateKeeper;
 class CTranscoder;
 extern CTranscoder g_Transcoder;
 
+void signalHandler(int);
+
+void mainLoop();
 
 ////////////////////////////////////////////////////////////////////////////////////////
 #endif /* main_h */

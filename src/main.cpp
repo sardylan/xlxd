@@ -22,6 +22,8 @@
 //    along with Foobar.  If not, see <http://www.gnu.org/licenses/>. 
 // ----------------------------------------------------------------------------
 
+#include <csignal>
+
 #include "main.h"
 #include "creflector.h"
 
@@ -34,6 +36,8 @@
 
 CReflector  g_Reflector;
 
+bool keepRunning;
+
 ////////////////////////////////////////////////////////////////////////////////////////
 // function declaration
 
@@ -41,6 +45,11 @@ CReflector  g_Reflector;
 
 int main(int argc, const char * argv[])
 {
+    keepRunning = true;
+
+    signal(SIGINT, signalHandler);
+    signal(SIGTERM, signalHandler);
+
 #ifdef RUN_AS_DAEMON
     
     // redirect cout, cerr and clog to syslog
@@ -110,29 +119,38 @@ int main(int argc, const char * argv[])
     }
     std::cout << "Reflector " << g_Reflector.GetCallsign()
               << "started and listening on " << g_Reflector.GetListenIp() << std::endl;
-    
-#ifdef RUN_AS_DAEMON
-	// run forever
-    while ( true )
-    {
-        // sleep 60 seconds
-        CTimePoint::TaskSleepFor(60000);
-    }
-#else
-    // wait any key
-    for (;;)
-    {
-        std::cin.get();
+
+    std::thread thread(mainLoop);
+
+    CTimePoint::TaskSleepFor(1000);
+    thread.join();
+
 #ifdef DEBUG_DUMPFILE
         g_Reflector.m_DebugFile.close();
 #endif
-    }
-#endif
-    
+
     // and wait for end
     g_Reflector.Stop();
     std::cout << "Reflector stopped" << std::endl;
-    
+
     // done
     exit(EXIT_SUCCESS);
+}
+
+void signalHandler(int signalValue) {
+    switch (signalValue) {
+        case SIGINT:
+        case SIGTERM:
+            keepRunning = false;
+
+        default:
+            break;
+    }
+}
+
+void mainLoop() {
+    while (keepRunning)
+        CTimePoint::TaskSleepFor(1000);
+
+    std::cout << "Main Loop ended" << std::endl;
 }
