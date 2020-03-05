@@ -71,7 +71,9 @@ add_executable(xlxd
         cysfpayload.cpp cysfpayload.h
         cysfprotocol.cpp cysfprotocol.h
         cysfutils.cpp cysfutils.h
+        config.cpp config.hpp
         main.cpp main.h
+        default.hpp
         syslog.h
         ysfdefines.h)
 

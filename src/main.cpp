@@ -97,11 +97,11 @@ int main(int argc, const char * argv[])
     // splash
     std::cout << "Starting xlxd " << VERSION_MAJOR << "." << VERSION_MINOR << "." << VERSION_REVISION << std::endl << std::endl;
 
-    // initialize reflector
-    g_Reflector.SetCallsign(argv[1]);
-    g_Reflector.SetListenIp(CIp(argv[2]));
-    g_Reflector.SetTranscoderIp(CIp(CIp(argv[3])));
-  
+    XLXConfig* config = XLXConfig::getInstance();
+    config->setCallsign(argv[1]);
+    config->setListenIp(argv[2]);
+    config->setTranscodedIp(argv[3]);
+
     // and let it run
     if ( !g_Reflector.Start() )
     {

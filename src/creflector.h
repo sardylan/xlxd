@@ -31,6 +31,7 @@
 #include "cprotocols.h"
 #include "cpacketstream.h"
 #include "cnotificationqueue.h"
+#include "config.hpp"
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -55,10 +56,10 @@ public:
     virtual ~CReflector();
     
     // settings
-    void SetCallsign(const CCallsign &callsign)     { m_Callsign = callsign; }
+//    void SetCallsign(const CCallsign &callsign)     { m_Callsign = callsign; }
     const CCallsign &GetCallsign(void) const        { return m_Callsign; }
-    void SetListenIp(const CIp &ip)                 { m_Ip = ip; }
-    void SetTranscoderIp(const CIp &ip)             { m_AmbedIp = ip; }
+//    void SetListenIp(const CIp &ip)                 { m_Ip = ip; }
+//    void SetTranscoderIp(const CIp &ip)             { m_AmbedIp = ip; }
     const CIp &GetListenIp(void) const              { return m_Ip; }
     const CIp &GetTranscoderIp(void) const          { return m_AmbedIp; }
     
@@ -144,6 +145,9 @@ public:
 #ifdef DEBUG_DUMPFILE
     std::ofstream        m_DebugFile;
 #endif
+
+private:
+    XLXConfig *config;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////
