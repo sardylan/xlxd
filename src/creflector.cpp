@@ -107,57 +107,57 @@ bool CReflector::Start(void)
     // reset stop flag
     m_bStopThreads = false;
 
-    std::cout << "  [CReflector::Start] Init gate keeper" << std:endl;
+    std::cout << "  [CReflector::Start] Init gate keeper" << std::endl;
     ok &= g_GateKeeper.Init();
 
-    std::cout << "  [CReflector::Start] Init DMR-ID directory" << std:endl;
+    std::cout << "  [CReflector::Start] Init DMR-ID directory" << std::endl;
     g_DmridDir.Init();
 
-    std::cout << "  [CReflector::Start] Init WIRES-X node directory" << std:endl;
+    std::cout << "  [CReflector::Start] Init WIRES-X node directory" << std::endl;
     g_YsfNodeDir.Init();
 
-    std::cout << "  [CReflector::Start] Init the transcoder" << std:endl;
+    std::cout << "  [CReflector::Start] Init the transcoder" << std::endl;
     g_Transcoder.Init();
 
-    std::cout << "  [CReflector::Start] Init protocols" << std:endl;
+    std::cout << "  [CReflector::Start] Init protocols" << std::endl;
     ok &= m_Protocols.Init();
 
     // if ok, start threads
     if ( ok )
     {
-        std::cout << "  [CReflector::Start] Start one thread per reflector module" << std:endl;
+        std::cout << "  [CReflector::Start] Start one thread per reflector module" << std::endl;
         for ( int i = 0; i < NB_OF_MODULES; i++ )
         {
-            std::cout << "   - " << i << std:endl;
+            std::cout << "   - " << i << std::endl;
             m_RouterThreads[i] = new std::thread(CReflector::RouterThread, this, &(m_Streams[i]));
         }
 
-        std::cout << "  [CReflector::Start] Start the XML reporting thread" << std:endl;
+        std::cout << "  [CReflector::Start] Start the XML reporting thread" << std::endl;
         m_XmlReportThread = new std::thread(CReflector::XmlReportThread, this);
 
 #ifdef JSON_MONITOR
-        std::cout << "  [CReflector::Start] Start the JSON reporting thread" << std:endl;
+        std::cout << "  [CReflector::Start] Start the JSON reporting thread" << std::endl;
         m_JsonReportThread = new std::thread(CReflector::JsonReportThread, this);
 #endif
     }
     else
     {
-        std::cout << "  [CReflector::Start] ERROR!!! Closing protocols" << std:endl;
+        std::cout << "  [CReflector::Start] ERROR!!! Closing protocols" << std::endl;
         m_Protocols.Close();
     }
 
-    std::cout << "  [CReflector::Start] Done" << std:endl;
+    std::cout << "  [CReflector::Start] Done" << std::endl;
     return ok;
 }
 
 void CReflector::Stop(void)
 {
-    std::cout << "  [CReflector::Stop] Stop & delete all threads" << std:endl;
+    std::cout << "  [CReflector::Stop] Stop & delete all threads" << std::endl;
     m_bStopThreads = true;
 
     if ( m_XmlReportThread != NULL )
     {
-        std::cout << "  [CReflector::Stop] Stop & delete XML report thread" << std:endl;
+        std::cout << "  [CReflector::Stop] Stop & delete XML report thread" << std::endl;
         m_XmlReportThread->join();
         delete m_XmlReportThread;
         m_XmlReportThread = NULL;
@@ -165,38 +165,38 @@ void CReflector::Stop(void)
 
     if ( m_JsonReportThread != NULL )
     {
-        std::cout << "  [CReflector::Stop] Stop & delete JSON report thread" << std:endl;
+        std::cout << "  [CReflector::Stop] Stop & delete JSON report thread" << std::endl;
         m_JsonReportThread->join();
         delete m_JsonReportThread;
         m_JsonReportThread = NULL;
     }
 
-    std::cout << "  [CReflector::Stop] Stop & delete all router thread" << std:endl;
+    std::cout << "  [CReflector::Stop] Stop & delete all router thread" << std::endl;
     for ( int i = 0; i < NB_OF_MODULES; i++ )
     {
         if ( m_RouterThreads[i] != NULL )
         {
-            std::cout << "   - " << i << std:endl;
+            std::cout << "   - " << i << std::endl;
             m_RouterThreads[i]->join();
             delete m_RouterThreads[i];
             m_RouterThreads[i] = NULL;
         }
     }
 
-    std::cout << "  [CReflector::Stop] Close protocols" << std:endl;
+    std::cout << "  [CReflector::Stop] Close protocols" << std::endl;
     m_Protocols.Close();
 
-    std::cout << "  [CReflector::Stop] Close transcoder" << std:endl;
+    std::cout << "  [CReflector::Stop] Close transcoder" << std::endl;
     g_Transcoder.Close();
 
-    std::cout << "  [CReflector::Stop] Close gatekeeper" << std:endl;
+    std::cout << "  [CReflector::Stop] Close gatekeeper" << std::endl;
     g_GateKeeper.Close();
 
-    std::cout << "  [CReflector::Stop] Close databases" << std:endl;
+    std::cout << "  [CReflector::Stop] Close databases" << std::endl;
     g_DmridDir.Close();
     g_YsfNodeDir.Close();
 
-    std::cout << "  [CReflector::Stop] Done" << std:endl;
+    std::cout << "  [CReflector::Stop] Done" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
