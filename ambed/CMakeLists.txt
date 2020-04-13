@@ -30,6 +30,7 @@ add_executable(ambed
         main.cpp main.h
         cconfig_default.hpp
         cconfig.cpp cconfig.hpp
+        cconfigparser.cpp cconfigparser.hpp
         syslog.h)
 
 target_link_libraries(ambed

@@ -23,13 +23,13 @@
 // ----------------------------------------------------------------------------
 
 #include <csignal>
+#include <sys/stat.h>
 
 #include "main.h"
 #include "ctimepoint.h"
 #include "cambeserver.h"
-
 #include "syslog.h"
-#include <sys/stat.h>
+#include "cconfigparser.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // global objects
@@ -40,8 +40,13 @@ bool keepRunning = true;
 // function declaration
 
 
-int main(int argc, const char * argv[])
+int main(int argc, char **argv)
 {
+    CConfigParser configParser(argc, argv);
+
+    if(!configParser.parse())
+        exit(EXIT_SUCCESS);
+
 #ifdef RUN_AS_DAEMON
 
     // redirect cout, cerr and clog to syslog
@@ -90,11 +95,9 @@ int main(int argc, const char * argv[])
 
     signal(SIGINT, signalHandler);
 
-    // check arguments
-    const char *listenIpAddress = argc == 2 ? argv[1] : "0.0.0.0";
-
     // initialize ambeserver
-    g_AmbeServer.SetListenIp(CIp(listenIpAddress));
+    CConfig *config = CConfig::getInstance();
+    g_AmbeServer.SetListenIp(CIp(config->getListenAddress().c_str()));
 
     // and let it run
     std::cout << "Starting AMBEd "
@@ -106,7 +109,9 @@ int main(int argc, const char * argv[])
         exit(EXIT_FAILURE);
     }
 
-    std::cout << "AMBEd started and listening on " << g_AmbeServer.GetListenIp() << std::endl;
+    std::cout << "AMBEd started and listening on "
+              << g_AmbeServer.GetListenIp() << ":" << config->getListenPort()
+              << std::endl;
 
     while (keepRunning)
         CTimePoint::TaskSleepFor(1000);

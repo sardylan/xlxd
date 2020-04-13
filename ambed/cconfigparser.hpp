@@ -23,24 +23,45 @@
  *
  */
 
-#ifndef __AMBED__CONFIG_DEFAULT__H
-#define __AMBED__CONFIG_DEFAULT__H
+#ifndef __AMBED__CONFIGPARSER__H
+#define __AMBED__CONFIGPARSER__H
 
-#define AMBED_CONFIG_LISTEN_ADDRESS_DEFAULT "0.0.0.0"
-#define AMBED_CONFIG_LISTEN_PORT_DEFAULT 10100
+#include "cconfig.hpp"
 
-#define AMBED_CONFIG_KEEPALIVE_PERIOD_DEFAULT 5
-#define AMBED_CONFIG_KEEPALIVE_TIMEOUT_DEFAULT 30
+class CConfigParser {
 
-#define AMBED_CONFIG_STREAM_MAX_NUMBER_DEFAULT 99
-#define AMBED_CONFIG_STREAM_ACTIVITY_TIMEOUT_DEFAULT 3
+public:
 
-#define AMBED_CONFIG_CODEC_GAIN_AMBEPLUS_DEFAULT -10
-#define AMBED_CONFIG_CODEC_GAIN_AMBE2PLUS_DEFAULT +10
+    CConfigParser(int argc, char **argv);
 
-#define AMBED_CONFIG_USE_AGC_DEFAULT false
-#define AMBED_CONFIG_AGC_CLAMPING_DEFAULT 3
+    ~CConfigParser();
 
-#define AMBED_CONFIG_USE_BAND_PASS_FILTER_DEFAULT true
+    bool parse();
+
+private:
+
+    CConfig *config;
+
+    int argc;
+    char **argv;
+
+    bool parseConfigFile(std::string configFile);
+
+    void printHelp();
+
+    static void printVersion();
+
+    static std::string formatDefault(const char *value);
+
+    static std::string formatDefault(const std::string &value);
+
+    static std::string formatDefault(int value);
+
+    static std::string formatDefault(unsigned int value);
+
+    static std::string formatDefault(uint16_t value);
+
+    static std::string formatDefault(bool value);
+};
 
 #endif

@@ -28,6 +28,7 @@
 
 #include <vector>
 #include "csampleblockprocessor.h"
+#include "cconfig.hpp"
 
 class CSignalProcessor
 {
@@ -42,6 +43,9 @@ public:
     void Process(uint8* voice, int length);
 
 private:
+
+    CConfig *config;
+
     std::vector<CSampleBlockProcessor *> m_sampleProcessors;
 };
 

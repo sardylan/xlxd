@@ -26,30 +26,23 @@
 
 #include "main.h"
 #include "csignalprocessor.h"
-
-#if USE_AGC == 1
 #include "cagc.h"
-#else
 #include "cfixedgain.h"
-#endif
-
-#if USE_BANDPASSFILTER == 1
 #include "cfirfilter.h"
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // constructor
 
 CSignalProcessor::CSignalProcessor(float gaindB)
 {
-#if USE_BANDPASSFILTER
-    m_sampleProcessors.push_back((CSampleBlockProcessor*)new CFIRFilter(FILTER_TAPS, FILTER_TAPS_LENGTH));
-#endif
-#if USE_AGC == 1
-    m_sampleProcessors.push_back((CSampleBlockProcessor*)new CAGC(gaindB));
-#else
-    m_sampleProcessors.push_back((CSampleBlockProcessor*)new CFixedGain(gaindB));
-#endif
+    config = CConfig::getInstance();
+
+    if (config->isUseBandPassFilter())
+        m_sampleProcessors.push_back((CSampleBlockProcessor *) new CFIRFilter(FILTER_TAPS, FILTER_TAPS_LENGTH));
+    if (config->isUseAgc())
+        m_sampleProcessors.push_back((CSampleBlockProcessor *) new CAGC(gaindB));
+    else
+        m_sampleProcessors.push_back((CSampleBlockProcessor *) new CFixedGain(gaindB));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
