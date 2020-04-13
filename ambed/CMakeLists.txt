@@ -28,6 +28,8 @@ add_executable(ambed
         cvocodecs.cpp cvocodecs.h
         cvoicepacket.cpp cvoicepacket.h
         main.cpp main.h
+        config_default.hpp
+        config.cpp config.hpp
         syslog.h)
 
 target_link_libraries(ambed
