@@ -38,8 +38,13 @@ if (FTD2XX_LIBRARY)
 
 else (FTD2XX_LIBRARY)
     set(FTD2XX_FOUND FALSE)
-    message(STATUS "libFTD2XX NOT FOUND.")
 endif (FTD2XX_LIBRARY)
 
 set(FTD2XX_INCLUDE_DIR
         ${FTD2XX_INCLUDE_DIR})
+
+find_package_handle_standard_args(FTD2XX
+        FOUND_VAR FTD2XX_FOUND
+        REQUIRED_VARS FTD2XX_INCLUDE_DIR FTD2XX_LIBRARY
+        VERSION_VAR ICU_VERSION
+        FAIL_MESSAGE "Failed to find FTD2XX components")
