@@ -1,15 +1,20 @@
-find_package(FTD2XX)
+find_package(FTD2XX REQUIRED)
 
 add_executable(ambed
+        cagc.cpp cagc.h
         cambepacket.cpp cambepacket.h
         cambeserver.cpp cambeserver.h
         cbuffer.cpp cbuffer.h
         ccallsign.cpp ccallsign.h
         ccontroller.cpp ccontroller.h
+        cfirfilter.cpp cfirfilter.h
+        cfixedgain.cpp cfixedgain.h
         cftdidevicedescr.cpp cftdidevicedescr.h
         cip.cpp cip.h
         cpacket.cpp cpacket.h
         cpacketqueue.cpp cpacketqueue.h
+        csampleblockprocessor.h
+        csignalprocessor.cpp csignalprocessor.h
         cstream.cpp cstream.h
         ctimepoint.cpp ctimepoint.h
         cudpsocket.cpp cudpsocket.h
