@@ -40,6 +40,8 @@
 
 CStream::CStream()
 {
+    config = CConfig::getInstance();
+
     m_uiId = 0;
     m_uiPort = 0;
     m_bStopThread = false;
@@ -52,6 +54,8 @@ CStream::CStream()
 
 CStream::CStream(uint16 uiId, const CCallsign &Callsign, const CIp &Ip, uint8 uiCodecIn, uint8 uiCodecOut)
 {
+    config = CConfig::getInstance();
+
     m_uiId = uiId;
     m_Callsign = Callsign;
     m_Ip = Ip;

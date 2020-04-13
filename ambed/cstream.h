@@ -28,6 +28,7 @@
 #include "cudpsocket.h"
 #include "ccallsign.h"
 #include "cvocodecchannel.h"
+#include "cconfig.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // class
@@ -53,7 +54,7 @@ public:
     uint8   GetCodecOut(void) const     { return m_uiCodecOut; }
     
     // activity timer
-    bool    IsActive(void) const        { return m_LastActivity.DurationSinceNow() <= STREAM_ACTIVITY_TIMEOUT; }
+    bool    IsActive(void) const        { return m_LastActivity.DurationSinceNow() <= config->getStreamActivityTimeout(); }
 
     // task
     static void Thread(CStream *);
@@ -91,6 +92,8 @@ protected:
     bool            m_bStopThread;
     std::thread     *m_pThread;
 
+private:
+    CConfig* config;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////

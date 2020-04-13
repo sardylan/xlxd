@@ -28,11 +28,11 @@
 
 #include <string>
 
-class Config {
+class CConfig {
 
 public:
 
-    static Config *getInstance();
+    static CConfig *getInstance();
 
     const std::string &getListenAddress() const;
 
@@ -80,11 +80,11 @@ public:
 
 private:
 
-    Config();
+    CConfig();
 
-    ~Config();
+    ~CConfig();
 
-    static Config *instance;
+    static CConfig *instance;
 
     std::string listenAddress;
     uint16_t listenPort;

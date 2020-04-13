@@ -23,12 +23,12 @@
  *
  */
 
-#include "config.hpp"
-#include "config_default.hpp"
+#include "cconfig.hpp"
+#include "cconfig_default.hpp"
 
-Config *Config::instance = nullptr;
+CConfig *CConfig::instance = nullptr;
 
-Config::Config() {
+CConfig::CConfig() {
     listenAddress = AMBED_CONFIG_LISTEN_ADDRESS_DEFAULT;
     listenPort = AMBED_CONFIG_LISTEN_PORT_DEFAULT;
 
@@ -47,99 +47,99 @@ Config::Config() {
     useBandPassFilter = AMBED_CONFIG_USE_BAND_PASS_FILTER_DEFAULT;
 }
 
-Config::~Config() = default;
+CConfig::~CConfig() = default;
 
-Config *Config::getInstance() {
-    if (Config::instance == nullptr)
-        Config::instance = new Config();
+CConfig *CConfig::getInstance() {
+    if (CConfig::instance == nullptr)
+        CConfig::instance = new CConfig();
 
-    return Config::instance;
+    return CConfig::instance;
 }
 
-const std::string &Config::getListenAddress() const {
+const std::string &CConfig::getListenAddress() const {
     return listenAddress;
 }
 
-void Config::setListenAddress(const std::string &value) {
-    Config::listenAddress = value;
+void CConfig::setListenAddress(const std::string &value) {
+    CConfig::listenAddress = value;
 }
 
-uint16_t Config::getListenPort() const {
+uint16_t CConfig::getListenPort() const {
     return listenPort;
 }
 
-void Config::setListenPort(uint16_t value) {
-    Config::listenPort = value;
+void CConfig::setListenPort(uint16_t value) {
+    CConfig::listenPort = value;
 }
 
-unsigned int Config::getKeepalivePeriod() const {
+unsigned int CConfig::getKeepalivePeriod() const {
     return keepalivePeriod;
 }
 
-void Config::setKeepalivePeriod(unsigned int value) {
-    Config::keepalivePeriod = value;
+void CConfig::setKeepalivePeriod(unsigned int value) {
+    CConfig::keepalivePeriod = value;
 }
 
-unsigned int Config::getKeepaliveTimeout() const {
+unsigned int CConfig::getKeepaliveTimeout() const {
     return keepaliveTimeout;
 }
 
-void Config::setKeepaliveTimeout(unsigned int value) {
-    Config::keepaliveTimeout = value;
+void CConfig::setKeepaliveTimeout(unsigned int value) {
+    CConfig::keepaliveTimeout = value;
 }
 
-unsigned int Config::getStreamMaxNumber() const {
+unsigned int CConfig::getStreamMaxNumber() const {
     return streamMaxNumber;
 }
 
-void Config::setStreamMaxNumber(unsigned int value) {
-    Config::streamMaxNumber = value;
+void CConfig::setStreamMaxNumber(unsigned int value) {
+    CConfig::streamMaxNumber = value;
 }
 
-unsigned int Config::getStreamActivityTimeout() const {
+unsigned int CConfig::getStreamActivityTimeout() const {
     return streamActivityTimeout;
 }
 
-void Config::setStreamActivityTimeout(unsigned int value) {
-    Config::streamActivityTimeout = value;
+void CConfig::setStreamActivityTimeout(unsigned int value) {
+    CConfig::streamActivityTimeout = value;
 }
 
-int Config::getCodecGainAmbePlus() const {
+int CConfig::getCodecGainAmbePlus() const {
     return codecGainAMBEPlus;
 }
 
-void Config::setCodecGainAmbePlus(int value) {
+void CConfig::setCodecGainAmbePlus(int value) {
     codecGainAMBEPlus = value;
 }
 
-int Config::getCodecGainAmbe2Plus() const {
+int CConfig::getCodecGainAmbe2Plus() const {
     return codecGainAMBE2Plus;
 }
 
-void Config::setCodecGainAmbe2Plus(int value) {
+void CConfig::setCodecGainAmbe2Plus(int value) {
     codecGainAMBE2Plus = value;
 }
 
-bool Config::isUseAgc() const {
+bool CConfig::isUseAgc() const {
     return useAgc;
 }
 
-void Config::setUseAgc(bool value) {
-    Config::useAgc = value;
+void CConfig::setUseAgc(bool value) {
+    CConfig::useAgc = value;
 }
 
-int Config::getAgcClamping() const {
+int CConfig::getAgcClamping() const {
     return agcClamping;
 }
 
-void Config::setAgcClamping(int value) {
-    Config::agcClamping = value;
+void CConfig::setAgcClamping(int value) {
+    CConfig::agcClamping = value;
 }
 
-bool Config::isUseBandPassFilter() const {
+bool CConfig::isUseBandPassFilter() const {
     return useBandPassFilter;
 }
 
-void Config::setUseBandPassFilter(bool value) {
-    Config::useBandPassFilter = value;
+void CConfig::setUseBandPassFilter(bool value) {
+    CConfig::useBandPassFilter = value;
 }

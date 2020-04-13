@@ -91,7 +91,9 @@ protected:
     // thread
     bool            m_bStopThread;
     std::thread     *m_pThread;
-    
+
+private:
+    CConfig *config;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////

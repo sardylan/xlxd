@@ -28,17 +28,20 @@
 #include <math.h>
 #include "cagc.h"
 #include "main.h"
+#include "cconfig.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // constructor
 
 CAGC::CAGC(float initialLeveldB)
 {
+    config = CConfig::getInstance();
+
     // set internal gain appropriately
     m_Gain = pow(10.0f, initialLeveldB/20.0f);
     //+- 10dB Margin, TODO Move margin to constant
-    m_GainMax = pow(10.0f, (initialLeveldB + AGC_CLAMPING)/20.0f);
-    m_GainMin = pow(10.0f, (initialLeveldB - AGC_CLAMPING)/20.0f);
+    m_GainMax = pow(10.0f, (initialLeveldB + config->getAgcClamping())/20.0f);
+    m_GainMin = pow(10.0f, (initialLeveldB - config->getAgcClamping())/20.0f);
                         
     m_EnergyPrime = 1.0f;
 

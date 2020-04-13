@@ -33,6 +33,8 @@
 
 CController::CController()
 {
+    config = CConfig::getInstance();
+
     m_bStopThread = false;
     m_pThread = NULL;
     m_Ip = CIp("127.0.0.1");
@@ -78,7 +80,7 @@ bool CController::Init(void)
     m_bStopThread = false;
     
     // create our socket
-    ok = m_Socket.Open(m_Ip, TRANSCODER_PORT);
+    ok = m_Socket.Open(m_Ip, config->getListenPort());
     if ( ok )
     {
         // start  thread;
@@ -86,7 +88,7 @@ bool CController::Init(void)
     }
     else
     {
-        std::cout << "Error opening socket on port UDP" << TRANSCODER_PORT << " on ip " << m_Ip << std::endl;
+        std::cout << "Error opening socket on port UDP" << config->getListenPort() << " on ip " << m_Ip << std::endl;
     }
     
     // done
@@ -208,9 +210,9 @@ CStream *CController::OpenStream(const CCallsign &Callsign, const CIp &Ip, uint8
     
     // create a new stream
     m_uiLastStreamId = (m_uiLastStreamId + 1);
-    m_uiLastStreamId = (m_uiLastStreamId == NB_MAX_STREAMS+1) ? 1 : m_uiLastStreamId;
+    m_uiLastStreamId = (m_uiLastStreamId == config->getStreamMaxNumber()+1) ? 1 : m_uiLastStreamId;
     stream = new CStream(m_uiLastStreamId, Callsign, Ip, CodecIn, CodecOut);
-    if ( stream->Init(TRANSCODER_PORT+m_uiLastStreamId) )
+    if ( stream->Init(config->getListenPort()+m_uiLastStreamId) )
     {
         std::cout << "Opened stream " << m_uiLastStreamId << std::endl;
         // and store it

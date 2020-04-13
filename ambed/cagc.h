@@ -29,6 +29,7 @@
 #define cagc_h
 
 #include "csampleblockprocessor.h"
+#include "cconfig.hpp"
 
 class CAGC : CSampleBlockProcessor
 {
@@ -39,8 +40,10 @@ public:
     //methods
     void ProcessSampleBlock(uint8* voice, int length) ;
     float GetGain();//gets current gain 
-    
+
 private:
+    CConfig* config;
+
     float m_Gain;            // current gain value
     float m_GainMax, m_GainMin;       //gain clamping
     float m_targetEnergy;        // scale value for target energy
