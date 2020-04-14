@@ -22,7 +22,7 @@
 //    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-#include "main.h"
+#include "globals.h"
 #include "ctimepoint.h"
 #include "cpacketqueue.h"
 #include "cvocodecinterface.h"

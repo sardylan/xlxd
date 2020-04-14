@@ -22,7 +22,7 @@
 //    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-#include "main.h"
+#include "globals.h"
 #include <cstring>
 #include "cusb3000interface.h"
 #include "cusb3003interface.h"

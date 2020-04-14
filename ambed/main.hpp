@@ -23,45 +23,9 @@
  *
  */
 
-#ifndef __AMBED__CONFIGPARSER__H
-#define __AMBED__CONFIGPARSER__H
+#ifndef __AMBED__MAIN__H
+#define __AMBED__MAIN__H
 
-#include "cconfig.hpp"
-
-class CConfigParser {
-
-public:
-
-    CConfigParser(int argc, char **argv);
-
-    ~CConfigParser();
-
-    bool parse();
-
-private:
-
-    CConfig *config;
-
-    int argc;
-    char **argv;
-
-    bool parseConfigFile(const std::string& configFile);
-
-    void printHelp();
-
-    static void printVersion();
-
-    static std::string formatDefault(const char *value);
-
-    static std::string formatDefault(const std::string &value);
-
-    static std::string formatDefault(int value);
-
-    static std::string formatDefault(unsigned int value);
-
-    static std::string formatDefault(uint16_t value);
-
-    static std::string formatDefault(bool value);
-};
+void signalHandler(int signum);
 
 #endif

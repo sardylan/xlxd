@@ -25,7 +25,7 @@
 //  Created by Florian Wolters (DF2ET) on 03/11/2017.
 //  Copyright © 2017 Florian Wolters (DF2ET). All rights reserved.
 
-#include "main.h"
+#include "globals.h"
 #include "ctimepoint.h"
 #include "cambepacket.h"
 #include "cusb3003df2etinterface.h"

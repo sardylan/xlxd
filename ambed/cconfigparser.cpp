@@ -26,10 +26,11 @@
 #include <cstring>
 #include <iostream>
 #include <getopt.h>
+#include <sstream>
 
 #include "cconfigparser.hpp"
 #include "cconfig_default.hpp"
-#include "main.h"
+#include "globals.h"
 
 CConfigParser::CConfigParser(int argc, char **argv) {
     CConfigParser::config = CConfig::getInstance();
@@ -155,7 +156,25 @@ bool CConfigParser::parse() {
     return ret;
 }
 
-bool CConfigParser::parseConfigFile(std::string configFile) {
+bool CConfigParser::parseConfigFile(const std::string &configFile) {
+    std::ifstream cfgFile(configFile);
+    if (!cfgFile.good()) {
+        std::cerr << "Config file \"" << configFile << "\" not found";
+        return false;
+    }
+
+    std::string line;
+    while (std::getline(cfgFile, line)) {
+        std::istringstream iss(line);
+
+        std::string param;
+        std::string value;
+        if (!(iss >> param >> value))
+            continue;
+
+        std::cout << param << value;
+    }
+
 //    FILE *fd;
 //    char param[80];
 //    char value[80];
@@ -228,10 +247,10 @@ bool CConfigParser::parseConfigFile(std::string configFile) {
 //            continue;
 //        }
 //    }
-//
-//    fclose(fd);
 
-    return true;
+    cfgFile.close();
+
+    return false;
 }
 
 void CConfigParser::printHelp() {

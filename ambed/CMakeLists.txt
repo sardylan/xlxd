@@ -27,7 +27,8 @@ add_executable(ambed
         cvocodecinterface.cpp cvocodecinterface.h
         cvocodecs.cpp cvocodecs.h
         cvoicepacket.cpp cvoicepacket.h
-        main.cpp main.h
+        main.cpp
+        globals.h
         cconfig_default.hpp
         cconfig.cpp cconfig.hpp
         cconfigparser.cpp cconfigparser.hpp

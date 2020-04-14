@@ -25,26 +25,21 @@
 #include <csignal>
 #include <sys/stat.h>
 
-#include "main.h"
+#include "main.hpp"
+#include "globals.h"
 #include "ctimepoint.h"
 #include "cambeserver.h"
 #include "syslog.h"
 #include "cconfigparser.hpp"
 
-////////////////////////////////////////////////////////////////////////////////////////
-// global objects
 
 bool keepRunning = true;
 
-////////////////////////////////////////////////////////////////////////////////////////
-// function declaration
 
-
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     CConfigParser configParser(argc, argv);
 
-    if(!configParser.parse())
+    if (!configParser.parse())
         exit(EXIT_SUCCESS);
 
 #ifdef RUN_AS_DAEMON
@@ -95,13 +90,11 @@ int main(int argc, char **argv)
 
     signal(SIGINT, signalHandler);
 
-    // initialize ambeserver
     CConfig *config = CConfig::getInstance();
     g_AmbeServer.SetListenIp(CIp(config->getListenAddress().c_str()));
 
-    // and let it run
     std::cout << "Starting AMBEd "
-              << VERSION_MAJOR << "." << VERSION_MINOR << "." << VERSION_REVISION << std::endl
+              << VERSION_MAJOR << "." << VERSION_MINOR << "." << VERSION_REVISION
               << std::endl;
 
     if (!g_AmbeServer.Start()) {

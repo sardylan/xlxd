@@ -24,7 +24,7 @@
 // ----------------------------------------------------------------------------
 // Geoffrey Merck F4FXL / KC3FRA AGC
 
-#include "main.h"
+#include "globals.h"
 #include "csignalprocessor.h"
 #include "cagc.h"
 #include "cfixedgain.h"

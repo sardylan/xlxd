@@ -26,7 +26,7 @@
 #ifndef csamplebloclprocessor_h
 #define csamplebloclprocessor_h
 
-#include "main.h"
+#include "globals.h"
 
 class CSampleBlockProcessor
 {
