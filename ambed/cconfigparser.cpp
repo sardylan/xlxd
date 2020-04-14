@@ -23,7 +23,6 @@
  *
  */
 
-#include <cstring>
 #include <iostream>
 #include <getopt.h>
 #include <sstream>
@@ -32,31 +31,70 @@
 #include "cconfig_default.hpp"
 #include "globals.h"
 
-CConfigParser::CConfigParser(int argc, char **argv) {
-    CConfigParser::config = CConfig::getInstance();
-
+CConfigParser::CConfigParser(CConfig *config, int argc, char **argv) {
+    CConfigParser::config = config;
     CConfigParser::argc = argc;
     CConfigParser::argv = argv;
 }
 
 CConfigParser::~CConfigParser() = default;
 
+void CConfigParser::print() {
+    std::cout << std::endl;
+    std::cout << "Listen address:                     "
+              << config->getListenAddress()
+              << std::endl;
+    std::cout << "Listen port:                        "
+              << format(config->getListenPort())
+              << std::endl;
+    std::cout << "Keep-Alive period:                  "
+              << format(config->getKeepalivePeriod()) << " secs"
+              << std::endl;
+    std::cout << "Keep-Alive timeout:                 "
+              << format(config->getKeepaliveTimeout()) << " secs"
+              << std::endl;
+    std::cout << "Stream max number:                  "
+              << format(config->getStreamMaxNumber())
+              << std::endl;
+    std::cout << "Stream activity timeout:            "
+              << format(config->getStreamActivityTimeout()) << " secs"
+              << std::endl;
+    std::cout << "Codec gain AMBE-Plus:               "
+              << format(config->getCodecGainAmbePlus()) << " dB"
+              << std::endl;
+    std::cout << "Codec gain AMBE2-Plus:              "
+              << format(config->getCodecGainAmbe2Plus()) << " dB"
+              << std::endl;
+    std::cout << "Use of AGC enabled:                 "
+              << format(config->isUseAgc())
+              << std::endl;
+    std::cout << "AGC clamping:                       "
+              << format(config->getAgcClamping()) << " dB"
+              << std::endl;
+    std::cout << "Use of Band-Pass filter enabled:    "
+              << format(config->isUseBandPassFilter())
+              << std::endl;
+    std::cout << std::endl;
+}
+
 bool CConfigParser::parse() {
-    bool ret = false;
     int optionIndex = 0;
     int c;
-    char *endPointer;
-
+    std::string value;
     std::string configFile;
 
-    bool confFile = false;
+    bool retArgs = false;
+    bool retConfigFile = true;
+
     bool helpRequested = false;
     bool versionRequested = false;
+    bool saveRequested = false;
 
     static struct option longOptions[] = {
             {"help",                    no_argument,       nullptr, 'h'},
             {"version",                 no_argument,       nullptr, 'V'},
             {"config",                  required_argument, nullptr, 'c'},
+            {"save-config",             no_argument,       nullptr, 's'},
             {"listen-address",          required_argument, nullptr, 'a'},
             {"listen-port",             required_argument, nullptr, 'p'},
             {"keepalive-period",        required_argument, nullptr, 'k'},
@@ -72,11 +110,16 @@ bool CConfigParser::parse() {
     };
 
     do {
-        c = getopt_long(argc, argv, "hVc:a:p:k:i:n:t:g:G:A:C:B:", longOptions, &optionIndex);
+        c = getopt_long(argc, argv, "hVc:sa:p:k:i:n:t:g:G:A:C:B:", longOptions, &optionIndex);
+
+        if (optarg != nullptr)
+            value = optarg;
+        else
+            value = "";
 
         switch (c) {
             case -1:
-                ret = true;
+                retArgs = true;
                 break;
 
             case '?':
@@ -89,52 +132,56 @@ bool CConfigParser::parse() {
                 break;
 
             case 'c':
-                confFile = true;
-                configFile = optarg;
+                configFile = value;
+                retConfigFile = loadConfigFile(configFile);
+                break;
+
+            case 's':
+                saveRequested = true;
                 break;
 
             case 'a':
-                config->setListenAddress(std::string(optarg));
+                config->setListenAddress(value);
                 break;
 
             case 'p':
-                config->setListenPort((uint16_t) strtol(optarg, &endPointer, 10));
+                config->setListenPort(parseUInt16(value));
                 break;
 
             case 'k':
-                config->setKeepalivePeriod((unsigned int) strtol(optarg, &endPointer, 10));
+                config->setKeepalivePeriod(parseUInt32(value));
                 break;
 
             case 'i':
-                config->setKeepaliveTimeout((unsigned int) strtol(optarg, &endPointer, 10));
+                config->setKeepaliveTimeout(parseUInt32(value));
                 break;
 
             case 'n':
-                config->setStreamMaxNumber((unsigned int) strtol(optarg, &endPointer, 10));
+                config->setStreamMaxNumber(parseUInt32(value));
                 break;
 
             case 't':
-                config->setStreamActivityTimeout((unsigned int) strtol(optarg, &endPointer, 10));
+                config->setStreamActivityTimeout(parseUInt32(value));
                 break;
 
             case 'g':
-                config->setCodecGainAmbePlus((int) strtol(optarg, &endPointer, 10));
+                config->setCodecGainAmbePlus(parseInt32(value));
                 break;
 
             case 'G':
-                config->setCodecGainAmbe2Plus((int) strtol(optarg, &endPointer, 10));
+                config->setCodecGainAmbe2Plus(parseInt32(value));
                 break;
 
             case 'A':
-                config->setUseAgc(std::strcmp(optarg, "true") == 0);
+                config->setUseAgc(parseBool(value));
                 break;
 
             case 'C':
-                config->setAgcClamping((int) strtol(optarg, &endPointer, 10));
+                config->setAgcClamping(parseInt32(value));
                 break;
 
             case 'B':
-                config->setUseAgc(std::strcmp(optarg, "true") == 0);
+                config->setUseAgc(parseBool(value));
                 break;
 
             default:
@@ -142,29 +189,33 @@ bool CConfigParser::parse() {
         }
     } while (c != -1);
 
-
-    if (helpRequested == 1) {
-        ret = false;
-        printHelp();
-    } else if (versionRequested == 1) {
-        ret = false;
-        printVersion();
-    } else if (confFile == 1) {
-        ret = parseConfigFile(configFile);
+    if (saveRequested) {
+        saveConfigFile(configFile);
     }
 
-    return ret;
+    if (helpRequested) {
+        retArgs = false;
+        printHelp();
+    } else if (versionRequested) {
+        retArgs = false;
+        printVersion();
+    }
+
+    return retArgs && retConfigFile;
 }
 
-bool CConfigParser::parseConfigFile(const std::string &configFile) {
+bool CConfigParser::loadConfigFile(const std::string &configFile) {
     std::ifstream cfgFile(configFile);
     if (!cfgFile.good()) {
         std::cerr << "Config file \"" << configFile << "\" not found";
         return false;
     }
 
+    int lineCount = 0;
     std::string line;
     while (std::getline(cfgFile, line)) {
+        lineCount++;
+
         std::istringstream iss(line);
 
         std::string param;
@@ -172,85 +223,59 @@ bool CConfigParser::parseConfigFile(const std::string &configFile) {
         if (!(iss >> param >> value))
             continue;
 
-        std::cout << param << value;
+        if (param == "listen-address") {
+            config->setListenAddress(value);
+        } else if (param == "listen-port") {
+            config->setListenPort(parseUInt16(value));
+        } else if (param == "keepalive-period") {
+            config->setKeepalivePeriod(parseUInt32(value));
+        } else if (param == "keepalive-timeout") {
+            config->setKeepaliveTimeout(parseUInt32(value));
+        } else if (param == "stream-max-number") {
+            config->setStreamMaxNumber(parseUInt32(value));
+        } else if (param == "stream-activity-timeout") {
+            config->setStreamActivityTimeout(parseUInt32(value));
+        } else if (param == "codec-gain-ambeplus") {
+            config->setCodecGainAmbePlus(parseInt32(value));
+        } else if (param == "codec-gain-ambe2plus") {
+            config->setCodecGainAmbe2Plus(parseInt32(value));
+        } else if (param == "use-agc") {
+            config->setUseAgc(parseBool(value));
+        } else if (param == "agc-clamping") {
+            config->setAgcClamping(parseInt32(value));
+        } else if (param == "use-band-pass-filter") {
+            config->setUseBandPassFilter(parseBool(value));
+        } else {
+            std::cerr << "Wrong param in config file!!!"
+                      << " line " << lineCount
+                      << " - param: \"" << param << "\""
+                      << std::endl;
+        }
     }
-
-//    FILE *fd;
-//    char param[80];
-//    char value[80];
-//    size_t ln;
-//    int linecount = 0;
-//    char *endptr;
-//
-//    fd = fopen(configFile, "r");
-//
-//    if (fd == NULL) {
-//        log_error(LOG_TAG, "Unable to open config file %s", configFile);
-//        return false;
-//    }
-//
-//    log_info(LOG_TAG, "Parsing config file %s", configFile);
-//
-//    while (!feof(fd)) {
-//        linecount++;
-//
-//        bzero(param, sizeof(param));
-//        bzero(value, sizeof(value));
-//
-//        if (fscanf(fd, "%s %s", param, value) != 2) {
-//            if (std::strlen(param) != 0 || std::strlen(value) != 0)
-//                log_error(LOG_TAG, "Unable to parse config file in line %d", linecount);
-//            continue;
-//        }
-//
-//        log_debug(LOG_TAG, "Param: %s - Value: %s", param, value);
-//
-//        if (strcmp(param, "debug-level") == 0) {
-//            conf->debug_level = (int) strtol(optarg, &endptr, 10);
-//            log_debug(LOG_TAG, "Configuration updated. debug-level = %d", conf->debug_level);
-//            continue;
-//        } else if (strcmp(param, "log-file-level") == 0) {
-//            conf->log_file_level = (int) strtol(optarg, &endptr, 10);
-//            log_debug(LOG_TAG, "Configuration updated. log-file-level = %d", conf->log_file_level);
-//            continue;
-//        } else if (strcmp(param, "log-file") == 0) {
-//            ln = std::strlen(value) + 1;
-//            conf->log_file = (char *) realloc((void *) conf->log_file, sizeof(char) * ln);
-//            strcpy(conf->log_file, value);
-//            log_debug(LOG_TAG, "Configuration updated. log-file = %s", conf->log_file);
-//            continue;
-//        } else if (strcmp(param, "inverter-loop-wait") == 0) {
-//            conf->inverter_loop_wait = (int) strtol(optarg, &endptr, 10);
-//            log_debug(LOG_TAG, "Configuration updated. inverter-loop-wait = %d", conf->inverter_loop_wait);
-//            continue;
-//        } else if (strcmp(param, "server-loop-wait") == 0) {
-//            conf->server_loop_wait = (int) strtol(optarg, &endptr, 10);
-//            log_debug(LOG_TAG, "Configuration updated. server-loop-wait = %d", conf->server_loop_wait);
-//            continue;
-//        } else if (strcmp(param, "daemon-num") == 0) {
-//            conf->daemon_num = (int) strtol(optarg, &endptr, 10);
-//            log_debug(LOG_TAG, "Configuration updated. daemon-num = %d", conf->daemon_num);
-//            continue;
-//        } else if (strcmp(param, "inverter-host") == 0) {
-//            ln = std::strlen(value) + 1;
-//            conf->inverter_host = (char *) realloc((void *) conf->inverter_host, sizeof(char) * ln);
-//            strcpy(conf->inverter_host, value);
-//            log_debug(LOG_TAG, "Configuration updated. inverter-host = %s", conf->inverter_host);
-//            continue;
-//        } else if (strcmp(param, "inverter-port") == 0) {
-//            conf->inverter_port = (int) strtol(optarg, &endptr, 10);
-//            log_debug(LOG_TAG, "Configuration updated. inverter-port = %d", conf->inverter_port);
-//            continue;
-//        } else if (strcmp(param, "inverter-num") == 0) {
-//            conf->inverter_num = (int) strtol(optarg, &endptr, 10);
-//            log_debug(LOG_TAG, "Configuration updated. inverter-num = %d", conf->inverter_num);
-//            continue;
-//        }
-//    }
 
     cfgFile.close();
 
-    return false;
+    return true;
+}
+
+bool CConfigParser::saveConfigFile(const std::string &configFile) {
+    std::ofstream cfgFile(configFile);
+
+    cfgFile << "listen-address" << " " << config->getListenAddress() << std::endl;
+    cfgFile << "listen-port" << " " << format(config->getListenPort()) << std::endl;
+    cfgFile << "keepalive-period" << " " << format(config->getKeepalivePeriod()) << std::endl;
+    cfgFile << "keepalive-timeout" << " " << format(config->getKeepaliveTimeout()) << std::endl;
+    cfgFile << "stream-max-number" << " " << format(config->getStreamMaxNumber()) << std::endl;
+    cfgFile << "stream-activity-timeout" << " " << format(config->getStreamActivityTimeout()) << std::endl;
+    cfgFile << "codec-gain-ambeplus" << " " << format(config->getCodecGainAmbePlus()) << std::endl;
+    cfgFile << "codec-gain-ambe2plus" << " " << format(config->getCodecGainAmbe2Plus()) << std::endl;
+    cfgFile << "use-agc" << " " << format(config->isUseAgc()) << std::endl;
+    cfgFile << "agc-clamping" << " " << format(config->getAgcClamping()) << std::endl;
+    cfgFile << "use-band-pass-filter" << " " << format(config->isUseBandPassFilter()) << std::endl;
+
+    cfgFile.close();
+
+    return true;
 }
 
 void CConfigParser::printHelp() {
@@ -262,35 +287,38 @@ void CConfigParser::printHelp() {
     std::cerr << " -V | --version                     Print program name and version" << std::endl;
     std::cerr << std::endl;
     std::cerr << " -c | --config                      Load configuration from file" << std::endl;
-    std::cerr << "                                    (if present, will override command line params)" << std::endl;
+    std::cerr << "                                    (if present, next options will override)" << std::endl;
+    std::cerr << std::endl;
+    std::cerr << " -s | --save-config                 Save current configuration into file" << std::endl;
+    std::cerr << "                                    (overwrite values in file specified with --config)" << std::endl;
     std::cerr << std::endl;
     std::cerr << " -a | --listen-address              Transcoder listen address"
               << formatDefault(AMBED_CONFIG_LISTEN_ADDRESS_DEFAULT) << std::endl;
     std::cerr << " -p | --listen-port                 Transcoder port (first control port)"
-              << formatDefault(AMBED_CONFIG_LISTEN_PORT_DEFAULT) << std::endl;
+              << formatDefault(format(AMBED_CONFIG_LISTEN_PORT_DEFAULT)) << std::endl;
     std::cerr << std::endl;
     std::cerr << " -k | --keepalive-period            Stream keep-alive period [in seconds]"
-              << formatDefault(AMBED_CONFIG_KEEPALIVE_PERIOD_DEFAULT) << std::endl;
+              << formatDefault(format(AMBED_CONFIG_KEEPALIVE_PERIOD_DEFAULT)) << std::endl;
     std::cerr << " -i | --keepalive-timeout           Stream keep-alive timeout [in seconds]"
-              << formatDefault(AMBED_CONFIG_KEEPALIVE_TIMEOUT_DEFAULT) << std::endl;
+              << formatDefault(format(AMBED_CONFIG_KEEPALIVE_TIMEOUT_DEFAULT)) << std::endl;
     std::cerr << std::endl;
     std::cerr << " -n | --stream-max-number           Max number of concurrent streams"
-              << formatDefault(AMBED_CONFIG_STREAM_MAX_NUMBER_DEFAULT) << std::endl;
+              << formatDefault(format(AMBED_CONFIG_STREAM_MAX_NUMBER_DEFAULT)) << std::endl;
     std::cerr << " -t | --stream-activity-timeout     Stream activity timeout"
-              << formatDefault(AMBED_CONFIG_STREAM_ACTIVITY_TIMEOUT_DEFAULT) << std::endl;
+              << formatDefault(format(AMBED_CONFIG_STREAM_ACTIVITY_TIMEOUT_DEFAULT)) << std::endl;
     std::cerr << std::endl;
     std::cerr << " -g | --codec-gain-ambeplus         Gain for AMBE-Plus codec [in dB, integer]"
-              << formatDefault(AMBED_CONFIG_CODEC_GAIN_AMBEPLUS_DEFAULT) << std::endl;
+              << formatDefault(format(AMBED_CONFIG_CODEC_GAIN_AMBEPLUS_DEFAULT)) << std::endl;
     std::cerr << " -G | --codec-gain-ambe2plus        Gain for AMBE2-Plus codec [in dB, integer]"
-              << formatDefault(AMBED_CONFIG_CODEC_GAIN_AMBE2PLUS_DEFAULT) << std::endl;
+              << formatDefault(format(AMBED_CONFIG_CODEC_GAIN_AMBE2PLUS_DEFAULT)) << std::endl;
     std::cerr << std::endl;
     std::cerr << " -A | --use-agc                     Enable use of AGC [true|false]"
-              << formatDefault(AMBED_CONFIG_USE_AGC_DEFAULT) << std::endl;
+              << formatDefault(format(AMBED_CONFIG_USE_AGC_DEFAULT)) << std::endl;
     std::cerr << " -C | --agc-clamping                AGC clamping value [in dB, integer]"
-              << formatDefault(AMBED_CONFIG_AGC_CLAMPING_DEFAULT) << std::endl;
+              << formatDefault(format(AMBED_CONFIG_AGC_CLAMPING_DEFAULT)) << std::endl;
     std::cerr << std::endl;
     std::cerr << " -B | --use-band-pass-filter        Enable use of Band-Pass filter [true|false]"
-              << formatDefault(AMBED_CONFIG_USE_BAND_PASS_FILTER_DEFAULT) << std::endl;
+              << formatDefault(format(AMBED_CONFIG_USE_BAND_PASS_FILTER_DEFAULT)) << std::endl;
     std::cerr << "                                    (works only if AGC is disabled)" << std::endl;
     std::cerr << std::endl;
 }
@@ -301,34 +329,46 @@ void CConfigParser::printVersion() {
               << std::endl;
 }
 
-std::string CConfigParser::formatDefault(const char *value) {
+std::string CConfigParser::formatDefault(const std::string &value) {
     char buff[1024];
-    std::sprintf(buff, " <%s>", value);
+    std::sprintf(buff, " <%s>", value.c_str());
     return std::string(buff);
 }
 
-std::string CConfigParser::formatDefault(const std::string &value) {
-    return formatDefault(value.c_str());
-}
-
-std::string CConfigParser::formatDefault(int value) {
+std::string CConfigParser::format(int value) {
     char buff[1024];
     std::sprintf(buff, "%d", value);
-    return formatDefault(buff);
+    return std::string(buff);
 }
 
-std::string CConfigParser::formatDefault(unsigned int value) {
+std::string CConfigParser::format(unsigned int value) {
     char buff[1024];
-    std::sprintf(buff, "%ud", value);
-    return formatDefault(buff);
+    std::sprintf(buff, "%u", value);
+    return std::string(buff);
 }
 
-std::string CConfigParser::formatDefault(uint16_t value) {
+std::string CConfigParser::format(uint16_t value) {
     char buff[1024];
-    std::sprintf(buff, "%ud", value);
-    return formatDefault(buff);
+    std::sprintf(buff, "%u", value);
+    return std::string(buff);
 }
 
-std::string CConfigParser::formatDefault(bool value) {
-    return formatDefault(value ? "true" : "false");
+std::string CConfigParser::format(bool value) {
+    return value ? "true" : "false";
+}
+
+bool CConfigParser::parseBool(const std::string &value) {
+    return (bool) (value == "true");
+}
+
+uint16_t CConfigParser::parseUInt16(const std::string &value) {
+    return (uint16_t) strtol(value.c_str(), nullptr, 10);
+}
+
+unsigned int CConfigParser::parseUInt32(const std::string &value) {
+    return (unsigned int) strtol(value.c_str(), nullptr, 10);
+}
+
+int CConfigParser::parseInt32(const std::string &value) {
+    return (int) strtol(value.c_str(), nullptr, 10);
 }

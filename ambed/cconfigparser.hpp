@@ -32,9 +32,11 @@ class CConfigParser {
 
 public:
 
-    CConfigParser(int argc, char **argv);
+    CConfigParser(CConfig *config, int argc, char **argv);
 
     ~CConfigParser();
+
+    void print();
 
     bool parse();
 
@@ -45,23 +47,32 @@ private:
     int argc;
     char **argv;
 
-    bool parseConfigFile(const std::string& configFile);
+    bool loadConfigFile(const std::string &configFile);
+
+    bool saveConfigFile(const std::string &configFile);
 
     void printHelp();
 
     static void printVersion();
 
-    static std::string formatDefault(const char *value);
-
     static std::string formatDefault(const std::string &value);
 
-    static std::string formatDefault(int value);
+    static std::string format(int value);
 
-    static std::string formatDefault(unsigned int value);
+    static std::string format(unsigned int value);
 
-    static std::string formatDefault(uint16_t value);
+    static std::string format(uint16_t value);
 
-    static std::string formatDefault(bool value);
+    static std::string format(bool value);
+
+    static bool parseBool(const std::string &value);
+
+    static uint16_t parseUInt16(const std::string &value);
+
+    static unsigned int parseUInt32(const std::string &value);
+
+    static int parseInt32(const std::string &value);
+
 };
 
 #endif

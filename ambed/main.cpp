@@ -37,10 +37,14 @@ bool keepRunning = true;
 
 
 int main(int argc, char **argv) {
-    CConfigParser configParser(argc, argv);
+    CConfig *config = CConfig::getInstance();
+
+    CConfigParser configParser(config, argc, argv);
 
     if (!configParser.parse())
         exit(EXIT_SUCCESS);
+
+    configParser.print();
 
 #ifdef RUN_AS_DAEMON
 
@@ -90,7 +94,6 @@ int main(int argc, char **argv) {
 
     signal(SIGINT, signalHandler);
 
-    CConfig *config = CConfig::getInstance();
     g_AmbeServer.SetListenIp(CIp(config->getListenAddress().c_str()));
 
     std::cout << "Starting AMBEd "
