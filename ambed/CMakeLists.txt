@@ -1,5 +1,7 @@
 find_package(FTD2XX REQUIRED)
 
+set(AMBED_VERSION "1.3.5")
+
 add_executable(ambed
         cagc.cpp cagc.h
         cambepacket.cpp cambepacket.h
@@ -42,3 +44,13 @@ target_link_libraries(ambed
 target_compile_options(ambed
         PRIVATE
         -Wall)
+
+install(TARGETS ambed
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        COMPONENT ambed)
+
+cpack_add_component(ambed
+        DISPLAY_NAME "AMBEd Transcoding daemon"
+        DESCRIPTION "AMBEd is a daemon for transcoding between AMBE-Plus and AMBE2-Plus"
+        DEPENDS libftd2xx
+        REQUIRED)
