@@ -26,6 +26,8 @@ add_executable(xlxd
         cdvframepacket.cpp cdvframepacket.h
         cdvheaderpacket.cpp cdvheaderpacket.h
         cdvlastframepacket.cpp cdvlastframepacket.h
+        cg3client.cpp cg3client.h
+        cg3protocol.cpp cg3protocol.h
         cgatekeeper.cpp cgatekeeper.h
         cgolay2087.cpp cgolay2087.h
         cgolay24128.cpp cgolay24128.h
@@ -42,11 +44,13 @@ add_executable(xlxd
         cprotocol.cpp cprotocol.h
         cprotocols.cpp cprotocols.h
         cqr1676.cpp cqr1676.h
+        crawsocket.cpp crawsocket.h
         creflector.cpp creflector.h
         crs129.cpp crs129.h
         csemaphore.cpp csemaphore.h
         ctimepoint.cpp ctimepoint.h
         ctranscoder.cpp ctranscoder.h
+        cudpmsgsocket.cpp cudpmsgsocket.h
         cudpsocket.cpp cudpsocket.h
         cuser.cpp cuser.h
         cusers.cpp cusers.h
@@ -82,3 +86,7 @@ target_link_libraries(xlxd
 target_compile_options(xlxd
         PRIVATE
         -Wall)
+
+install(TARGETS xlxd
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        COMPONENT xlxd)
