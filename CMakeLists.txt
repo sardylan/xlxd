@@ -16,9 +16,6 @@ set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
 message("Threads flags: ${CMAKE_THREAD_LIBS_INIT}")
 
-add_subdirectory(3rdparty)
 #add_subdirectory(src)
 add_subdirectory(ambed)
 add_subdirectory(ambedtest)
-
-message("${CPACK_COMPONENTS_ALL}")

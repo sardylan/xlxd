@@ -48,9 +48,3 @@ target_compile_options(ambed
 install(TARGETS ambed
         RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
         COMPONENT ambed)
-
-cpack_add_component(ambed
-        DISPLAY_NAME "AMBEd Transcoding daemon"
-        DESCRIPTION "AMBEd is a daemon for transcoding between AMBE-Plus and AMBE2-Plus"
-        DEPENDS libftd2xx
-        REQUIRED)

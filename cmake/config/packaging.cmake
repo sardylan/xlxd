@@ -21,3 +21,13 @@ set(CPACK_DEB_COMPONENT_INSTALL ON)
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
 
 include(CPack)
+
+cpack_add_component(ambed
+        DISPLAY_NAME "AMBEd Transcoding daemon"
+        DESCRIPTION "AMBEd is a daemon for transcoding between AMBE-Plus and AMBE2-Plus"
+        REQUIRED)
+
+cpack_add_component(xlxd
+        DISPLAY_NAME "XLX Reflector"
+        DESCRIPTION "XLX Reflector for D-Star"
+        REQUIRED)

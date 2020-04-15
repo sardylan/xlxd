@@ -20,3 +20,7 @@ target_compile_options(ambed
 
 add_test(ambedtest
         ambedtest)
+
+install(TARGETS ambedtest
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        COMPONENT ambed)
