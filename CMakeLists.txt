@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project(xlxd)
+project(XLX)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -7,7 +7,11 @@ include(GNUInstallDirs)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
-set(XLXD_VERSION "1.4.0")
+set(XLX_VERSION_MAJOR "1")
+set(XLX_VERSION_MINOR "4")
+set(XLX_VERSION_PATCH "0")
+
+set(XLX_VERSION "${XLX_VERSION_MAJOR}.${XLX_VERSION_MINOR}.${XLX_VERSION_PATCH}")
 
 include(cmake/config/packaging.cmake)
 
