@@ -53,16 +53,16 @@ CUsb3xxxInterface::CUsb3xxxInterface(uint32 uiVid, uint32 uiPid, const char *szD
 CUsb3xxxInterface::~CUsb3xxxInterface()
 {
     // delete m_SpeechQueues
-    for ( int i = 0; i < m_SpeechQueues.size(); i++ )
+    for (auto & m_SpeechQueue : m_SpeechQueues)
     {
-        delete m_SpeechQueues[i];
+        delete m_SpeechQueue;
     }
     m_SpeechQueues.clear();
     
     // delete m_ChannelQueues
-    for ( int i = 0; i < m_ChannelQueues.size(); i++ )
+    for (auto & m_ChannelQueue : m_ChannelQueues)
     {
-        delete m_ChannelQueues[i];
+        delete m_ChannelQueue;
     }
     m_ChannelQueues.clear();
 }
@@ -184,10 +184,10 @@ void CUsb3xxxInterface::Task(void)
     do
     {
         done = true;
-        for ( int i = 0; i < m_Channels.size(); i++)
+        for (auto & m_Channel : m_Channels)
         {
             // get channel
-            Channel = m_Channels[i];
+            Channel = m_Channel;
             
             // any packet in voice queue ?
             if ( Channel->IsInterfaceOut(this) )
@@ -269,7 +269,7 @@ void CUsb3xxxInterface::Task(void)
     
     // process device queue to feed hardware
     // make sure that device fifo is fed all the time
-    int fifoSize = GetDeviceFifoSize();
+    size_t fifoSize = GetDeviceFifoSize();
     do
     {
         done = true;

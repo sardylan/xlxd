@@ -128,8 +128,8 @@ protected:
     std::vector<CPacketQueue*>  m_SpeechQueues;
     std::vector<CPacketQueue*>  m_ChannelQueues;
     CPacketQueue                m_DeviceQueue;
-    int                         m_iSpeechFifolLevel;
-    int                         m_iChannelFifolLevel;
+    size_t                      m_iSpeechFifolLevel;
+    size_t                      m_iChannelFifolLevel;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////

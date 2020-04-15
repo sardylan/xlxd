@@ -38,7 +38,7 @@ CBuffer::CBuffer(uint8 *buffer, int len)
 ////////////////////////////////////////////////////////////////////////////////////////
 // set
 
-void CBuffer::Set(uint8 *buffer, int len)
+void CBuffer::Set(uint8 *buffer, size_t len)
 {
     resize(len);
     ::memcpy(data(), buffer, len);
@@ -50,14 +50,14 @@ void CBuffer::Set(const char *sz)
     ::strcpy((char *)data(), sz);
 }
 
-void CBuffer::Append(uint8 *buffer, int len)
+void CBuffer::Append(uint8 *buffer, size_t len)
 {
     int n = (int)size();
     resize(n+len);
     ::memcpy(&(data()[n]), buffer, len);
 }
 
-void CBuffer::Append(uint8 ui, int len)
+void CBuffer::Append(uint8 ui, size_t len)
 {
     int n = (int)size();
     resize(n+len);
@@ -91,7 +91,7 @@ void CBuffer::Append(const char *sz)
     Append((uint8)0x00);
 }
 
-void CBuffer::ReplaceAt(int i, uint8 ui)
+void CBuffer::ReplaceAt(size_t i, uint8 ui)
 {
     if ( size() < (i+sizeof(uint8)) )
     {
@@ -100,7 +100,7 @@ void CBuffer::ReplaceAt(int i, uint8 ui)
     *(uint8 *)(&(data()[i])) = ui;
 }
 
-void CBuffer::ReplaceAt(int i, uint16 ui)
+void CBuffer::ReplaceAt(size_t i, uint16 ui)
 {
     if ( size() < (i+sizeof(uint16)) )
     {
@@ -109,7 +109,7 @@ void CBuffer::ReplaceAt(int i, uint16 ui)
     *(uint16 *)(&(data()[i])) = ui;
 }
 
-void CBuffer::ReplaceAt(int i, uint32 ui)
+void CBuffer::ReplaceAt(size_t i, uint32 ui)
 {
     if ( size() < (i+sizeof(uint32)) )
     {
@@ -118,7 +118,7 @@ void CBuffer::ReplaceAt(int i, uint32 ui)
     *(uint32 *)(&(data()[i])) = ui;
 }
 
-void CBuffer::ReplaceAt(int i, const uint8 *ptr, int len)
+void CBuffer::ReplaceAt(size_t i, const uint8 *ptr, size_t len)
 {
     if ( size() < (i+len) )
     {
@@ -130,7 +130,7 @@ void CBuffer::ReplaceAt(int i, const uint8 *ptr, int len)
 ////////////////////////////////////////////////////////////////////////////////////////
 // operation
 
-int CBuffer::Compare(uint8 *buffer, int len) const
+int CBuffer::Compare(uint8 *buffer, size_t len) const
 {
     int result = -1;
     if ( size() >= len )
@@ -140,7 +140,7 @@ int CBuffer::Compare(uint8 *buffer, int len) const
     return result;
 }
 
-int CBuffer::Compare(uint8 *buffer, int off, int len) const
+int CBuffer::Compare(uint8 *buffer, size_t off, size_t len) const
 {
     int result = -1;
     if ( size() >= (off+len) )
@@ -182,7 +182,7 @@ CBuffer::operator const char *() const
 
 void CBuffer::DebugDump(std::ofstream &debugout)
 {
-    for ( int i = 0; i < size(); i++ )
+    for ( size_t i = 0; i < size(); i++ )
     {
         char sz[16];
         sprintf(sz, "%02X", data()[i]);

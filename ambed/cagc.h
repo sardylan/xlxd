@@ -35,7 +35,7 @@ class CAGC : CSampleBlockProcessor
 {
 public:
     //Constructor
-    CAGC(float initialLeveldB);
+    explicit CAGC(float initialLeveldB);
 
     //methods
     void ProcessSampleBlock(uint8* voice, int length) ;

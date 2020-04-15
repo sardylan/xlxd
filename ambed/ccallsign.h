@@ -50,10 +50,10 @@ public:
     
     // set
     void SetCallsign(const char *);
-    void SetCallsign(const uint8 *, int);
+    void SetCallsign(const uint8 *, size_t);
     
     // modify
-    void PatchCallsign(int, const uint8 *, int);
+    void PatchCallsign(size_t, const uint8 *, size_t);
     
     // get
     void GetCallsign(uint8 *) const;

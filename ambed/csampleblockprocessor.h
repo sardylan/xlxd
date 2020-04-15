@@ -31,8 +31,12 @@
 class CSampleBlockProcessor
 {
 public:
+
+    virtual ~CSampleBlockProcessor() = default;
+
     //processing
     virtual void ProcessSampleBlock(uint8* voice, int length) = 0;
+
 };
 
 #endif /* csampleprocessor_h */

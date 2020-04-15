@@ -52,7 +52,7 @@ CController::~CController()
     // close all streams
     m_Mutex.lock();
     {
-        for ( int i = 0; i < m_Streams.size(); i++ )
+        for ( size_t i = 0; i < m_Streams.size(); i++ )
         {
             delete m_Streams[i];
         }
@@ -180,7 +180,7 @@ void CController::Task(void)
         // any inactive streams?
         Lock();
         {
-            for ( int i = 0; (i < m_Streams.size()) && !timeout; i++ )
+            for ( size_t i = 0; (i < m_Streams.size()) && !timeout; i++ )
             {
                 if ( !(m_Streams[i]->IsActive()) )
                 {
@@ -236,7 +236,7 @@ void CController::CloseStream(CStream *stream)
     {
         // look for the stream
         bool found = false;
-        for ( int i = 0; (i < m_Streams.size()) && !found; i++ )
+        for ( size_t i = 0; (i < m_Streams.size()) && !found; i++ )
         {
             // compare object pointers
             if ( (m_Streams[i]) ==  stream )
@@ -260,7 +260,7 @@ void CController::CloseStream(uint16 StreamId)
     {
         // look for the stream
         bool found = false;
-        for ( int i = 0; (i < m_Streams.size()) && !found; i++ )
+        for ( size_t i = 0; (i < m_Streams.size()) && !found; i++ )
         {
             // compare object pointers
             if ( (m_Streams[i]->GetId()) ==  StreamId )

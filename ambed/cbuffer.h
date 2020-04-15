@@ -38,22 +38,22 @@ public:
     virtual ~CBuffer() {};
     
     // set
-    void Set(uint8 *, int);
+    void Set(uint8 *, size_t);
     void Set(const char *);
-    void Append(uint8 *, int);
-    void Append(uint8, int);
+    void Append(uint8 *, size_t);
+    void Append(uint8, size_t);
     void Append(uint8);
     void Append(uint16);
     void Append(uint32);
     void Append(const char *);
-    void ReplaceAt(int, uint8);
-    void ReplaceAt(int, uint16);
-    void ReplaceAt(int, uint32);
-    void ReplaceAt(int, const uint8 *, int);
+    void ReplaceAt(size_t, uint8);
+    void ReplaceAt(size_t, uint16);
+    void ReplaceAt(size_t, uint32);
+    void ReplaceAt(size_t, const uint8 *, size_t);
     
     // operation
-    int Compare(uint8 *, int) const;
-    int Compare(uint8 *, int, int) const;
+    int Compare(uint8 *, size_t) const;
+    int Compare(uint8 *, size_t, size_t) const;
     
     // operator
     bool operator ==(const CBuffer &) const;

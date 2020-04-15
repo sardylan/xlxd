@@ -50,9 +50,9 @@ CSignalProcessor::CSignalProcessor(float gaindB)
 
 CSignalProcessor::~CSignalProcessor()
 {
-    for(int i = 0; i < m_sampleProcessors.size(); i++)
+    for(auto & m_sampleProcessor : m_sampleProcessors)
     {
-        delete m_sampleProcessors[i];
+        delete m_sampleProcessor;
     }
 }
 
@@ -65,7 +65,7 @@ void CSignalProcessor::Process(uint8* voice, int length)
     int j;*/
     auto processorsSize = m_sampleProcessors.size();
 
-    for(int j = 0; j < processorsSize; j++)
+    for(size_t j = 0; j < processorsSize; j++)
     {
         m_sampleProcessors[j]->ProcessSampleBlock(voice, length);
     }

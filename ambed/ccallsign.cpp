@@ -88,16 +88,16 @@ void CCallsign::SetCallsign(const char *sz)
     ::memcpy(m_Callsign, sz, MIN(strlen(sz), sizeof(m_Callsign)));
 }
 
-void CCallsign::SetCallsign(const uint8 *buffer, int len)
+void CCallsign::SetCallsign(const uint8 *buffer, size_t len)
 {
     // set callsign
     ::memset(m_Callsign, ' ', sizeof(m_Callsign));
     ::memcpy(m_Callsign, buffer, MIN(len, sizeof(m_Callsign)));
-    for ( int i = 0; i < sizeof(m_Callsign); i++ )
+    for (char & i : m_Callsign)
     {
-        if ( m_Callsign[i] == 0 )
+        if ( i == 0 )
         {
-            m_Callsign[i] = ' ';
+            i = ' ';
         }
     }
 }
@@ -106,7 +106,7 @@ void CCallsign::SetCallsign(const uint8 *buffer, int len)
 ////////////////////////////////////////////////////////////////////////////////////////
 // modify
 
-void CCallsign::PatchCallsign(int off, const uint8 *patch, int len)
+void CCallsign::PatchCallsign(size_t off, const uint8 *patch, size_t len)
 {
     if ( off < sizeof(m_Callsign) )
     {
@@ -125,7 +125,7 @@ void CCallsign::GetCallsign(uint8 *buffer) const
 
 void CCallsign::GetCallsignString(char *sz) const
 {
-    int i;
+    size_t i;
     for ( i = 0; (i < sizeof(m_Callsign)) && (m_Callsign[i] != ' '); i++ )
     {
         sz[i] = m_Callsign[i];
@@ -146,7 +146,7 @@ bool CCallsign::HasSameCallsignWithWildcard(const CCallsign &callsign) const
     bool same = true;
     bool done = false;
     
-    for ( int i = 0; (i < sizeof(m_Callsign)) && same && !done; i++ )
+    for ( size_t i = 0; (i < sizeof(m_Callsign)) && same && !done; i++ )
     {
         if ( !(done = ((m_Callsign[i] == '*') || (callsign[i] == '*'))) )
         {
